@@ -28,11 +28,35 @@ var SelectBuilder = module.exports = function(schema, currentTable, queryObject,
   }
 
   var queries = [];
-  queries.push(this.buildSimpleSelect(queryObject));
+  if(queryObject.fetchPlan){
+    queries.push(this.buildFetchPlanSelect(queryObject));
+  } else {
+    queries.push(this.buildSimpleSelect(queryObject));
+  }
 
   return {
     select: queries
   };
+};
+
+/**
+ * Build a fetch plan Select statement.
+ */
+
+SelectBuilder.prototype.buildFetchPlanSelect = function buildFetchPlanSelect(queryObject) {
+  var self = this;
+  
+  // Escape table name
+  var tableName = utils.escapeName(self.schema[self.currentTable].tableName, self.escapeCharacter);
+  delete queryObject.select;
+  
+  var query = 'SELECT ';
+  
+  query += "@this.toJSON('rid,fetchPlan:" + queryObject.fetchPlan + "')";
+  
+  query += ' FROM ' + tableName + ' ';
+  
+  return query;
 };
 
 /**
@@ -57,7 +81,7 @@ SelectBuilder.prototype.buildSimpleSelect = function buildSimpleSelect(queryObje
 
   var attributes = queryObject.select || Object.keys(this.schema[this.currentTable].attributes);
   delete queryObject.select;
-
+  
   attributes.forEach(function(key) {
     // Default schema to {} in case a raw DB column name is sent.  This shouldn't happen
     // after https://github.com/balderdashy/waterline/commit/687c869ad54f499018ab0b038d3de4435c96d1dd
@@ -103,7 +127,7 @@ SelectBuilder.prototype.buildSimpleSelect = function buildSimpleSelect(queryObje
 
   // Remove the last comma
   query = query.slice(0, -2) + ' FROM ' + tableName + ' ';
-
+  
   return query;
 };
 
