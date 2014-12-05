@@ -152,3 +152,18 @@ utils.escapeString = function(value) {
 utils.toSqlDate = function(date) {
   return date.toUTCString();
 };
+
+/**
+ * Check if an ID resembles an OrientDB Record ID.
+ *
+ * @param {String} id
+ * @return {Boolean}
+ * @api public
+ */
+utils.matchRecordId = function matchRecordId(id) {
+  if (id === null) return false;
+  var test = _.cloneDeep(id);
+  if(typeof test.toString !== 'undefined')
+    test = id.toString();
+  return test.match(/^\#\-?\d+\:\d+$/) ? true : false;
+};
