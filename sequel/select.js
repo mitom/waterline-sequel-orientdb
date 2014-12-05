@@ -64,7 +64,10 @@ SelectBuilder.prototype.buildSimpleSelect = function buildSimpleSelect(queryObje
     // but leaving here as a failsafe.
     var schema = self.schema[self.currentTable].attributes[key] || {};
     if(hop(schema, 'collection')) return;
-    selectKeys.push({ table: self.currentTable, key: schema.columnName || key });
+    
+    var selectKey = key === 'id' ? '@rid' : key;  // Philosophically unsure if this belongs to waterline-sequel-orientb or waterline-orientdb
+    
+    selectKeys.push({ table: self.currentTable, key: schema.columnName || selectKey });
   });
 
   // Add any hasFK strategy joins to the main query
