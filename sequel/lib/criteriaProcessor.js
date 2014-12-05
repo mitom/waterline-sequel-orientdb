@@ -287,7 +287,7 @@ CriteriaProcessor.prototype._in = function _in(key, val) {
       self.paramCount++;
     }
     else {
-      if(_.isString(value)) {
+      if(_.isString(value) && !utils.matchRecordId(value)) {
         value = '"' + utils.escapeString(value) + '"';
       }
 
@@ -541,7 +541,7 @@ CriteriaProcessor.prototype.prepareCriterion = function prepareCriterion(key, va
             str = 'NOT IN [';
             value.forEach(function(val) {
 
-              if(_.isString(val)) {
+              if(_.isString(val) && !utils.matchRecordId(val)) {
                 val = '"' + utils.escapeString(val) + '"';
               }
 
