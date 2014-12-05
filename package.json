@@ -1,13 +1,13 @@
 {
-  "name": "waterline-sequel",
-  "description": "A helper library for generating SQL queries from the Waterline Query Language.",
+  "name": "waterline-sequel-orientdb",
+  "description": "A helper library for generating OrientDB SQL queries from the Waterline Query Language.",
   "version": "0.0.19",
-  "author": "Cody Stoltman <particlebanana@gmail.com>",
+  "author": "Dário Marcelino <dario@appscot.com>",
   "url": "http://github.com/balderdashy/waterline-sequel",
   "keywords": [],
   "repository": {
     "type": "git",
-    "url": "git://github.com/balderdashy/waterline-sequel.git"
+    "url": "git://github.com/appscot/waterline-sequel-orientdb.git"
   },
   "dependencies": {
     "lodash": "~2.4.1"
@@ -19,5 +19,5 @@
     "sequel": "./sequel"
   },
   "license": "MIT",
-  "bugs": "https://github.com/balderdashy/waterline-sequel/issues"
+  "bugs": "https://github.com/appscot/waterline-sequel-orientdb/issues"
 }
