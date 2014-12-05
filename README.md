@@ -1,4 +1,4 @@
-Waterline-Sequel
-====================
+Waterline-Sequel-OrientDB
+=========================
 
-A helper library for generating SQL queries from the Waterline Query Language.
+A helper library for generating OrientDB SQL queries from the Waterline Query Language.

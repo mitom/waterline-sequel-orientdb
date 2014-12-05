@@ -264,13 +264,13 @@ CriteriaProcessor.prototype._in = function _in(key, val) {
   // Check case sensitivity to decide if LOWER logic is used
   if(!caseSensitivity) {
     if(lower) {
-      key = 'LOWER(' + utils.escapeName(self.currentTable, self.escapeCharacter) + '.' + utils.escapeName(key, self.escapeCharacter) + ')';
+      key = utils.escapeName(key, self.escapeCharacter)  + '.toLowerCase()';
     } else {
-      key = utils.escapeName(self.currentTable, self.escapeCharacter) + '.' + utils.escapeName(key, self.escapeCharacter);
+      key = utils.escapeName(key, self.escapeCharacter);
     }
-    self.queryString += key + ' IN (';
+    self.queryString += key + ' IN [';
   } else {
-    self.queryString += utils.escapeName(self.currentTable, self.escapeCharacter) + '.' + utils.escapeName(key, self.escapeCharacter) + ' IN (';
+    self.queryString += utils.escapeName(key, self.escapeCharacter) + ' IN [';
   }
 
   // Append each value to query
@@ -298,7 +298,7 @@ CriteriaProcessor.prototype._in = function _in(key, val) {
   });
 
   // Strip last comma and close criteria
-  self.queryString = self.queryString.slice(0, -1) + ')';
+  self.queryString = self.queryString.slice(0, -1) + ']';
 
   self.queryString += ' AND ';
 };
@@ -341,10 +341,10 @@ CriteriaProcessor.prototype.process = function process(parent, value, combinator
       // Check if value is a string and if so add LOWER logic
       // to work with case in-sensitive queries
       if(!caseSensitive && _.isString(obj[key]) && lower) {
-        _param = 'LOWER(' + utils.escapeName(self.currentTable, self.escapeCharacter) + '.' + utils.escapeName(parent, self.escapeCharacter) + ')';
+        _param = utils.escapeName(parent, self.escapeCharacter) + '.toLowerCase()';
         obj[key] = obj[key].toLowerCase();
       } else {
-        _param = utils.escapeName(self.currentTable, self.escapeCharacter) + '.' + utils.escapeName(parent, self.escapeCharacter);
+        _param = utils.escapeName(parent, self.escapeCharacter);
       }
 
       self.queryString += _param + ' ';
@@ -382,12 +382,12 @@ CriteriaProcessor.prototype.process = function process(parent, value, combinator
   if(!caseSensitive && lower && _.isString(value)) {
 
     // ADD LOWER to parent
-    parent = 'LOWER(' + utils.escapeName(self.currentTable, self.escapeCharacter) + '.' + utils.escapeName(parent, self.escapeCharacter) + ')';
+    parent = utils.escapeName(parent, self.escapeCharacter) + '.toLowerCase()';
     value = value.toLowerCase();
 
   } else {
     // Escape parent
-    parent = utils.escapeName(self.currentTable, self.escapeCharacter) + '.' + utils.escapeName(parent, self.escapeCharacter);
+    parent = utils.escapeName(parent, self.escapeCharacter);
   }
 
   if(value !== null) {
@@ -526,19 +526,19 @@ CriteriaProcessor.prototype.prepareCriterion = function prepareCriterion(key, va
             var params = [];
 
             this.values = this.values.concat(value);
-            str = 'NOT IN (';
+            str = 'NOT IN [';
 
             value.forEach(function() {
               params.push('$' + self.paramCount++);
             });
 
-            str += params.join(',') + ')';
+            str += params.join(',') + ']';
 
             // Roll back one since we bump the count at the end
             this.paramCount--;
           }
           else {
-            str = 'NOT IN (';
+            str = 'NOT IN [';
             value.forEach(function(val) {
 
               if(_.isString(val)) {
@@ -548,7 +548,7 @@ CriteriaProcessor.prototype.prepareCriterion = function prepareCriterion(key, va
               str += val + ',';
             });
 
-            str = str.slice(0, -1) + ')';
+            str = str.slice(0, -1) + ']';
           }
         }
         // Otherwise do a regular <>
@@ -662,7 +662,7 @@ CriteriaProcessor.prototype.limit = function(options) {
   // Some MySQL hackery here.  For details, see:
   // http://stackoverflow.com/questions/255517/mysql-offset-infinite-rows
   if(options === null || options === undefined) {
-    this.queryString += ' LIMIT 184467440737095516 ';
+    this.queryString += ' LIMIT 2147483647 ';  // TODO: confirm this is the right approach for OrientDB
   }
   else {
     this.queryString += ' LIMIT ' + options;
@@ -688,7 +688,7 @@ CriteriaProcessor.prototype.sort = function(options) {
 
   Object.keys(options).forEach(function(key) {
     var direction = options[key] === 1 ? 'ASC' : 'DESC';
-    self.queryString += utils.escapeName(self.currentTable, self.escapeCharacter) + '.' + utils.escapeName(key, self.escapeCharacter) + ' ' + direction + ', ';
+    self.queryString += utils.escapeName(key, self.escapeCharacter) + ' ' + direction + ', ';
   });
 
   // Remove trailing comma
@@ -708,7 +708,7 @@ CriteriaProcessor.prototype.group = function(options) {
   if(!Array.isArray(options)) options = [options];
 
   options.forEach(function(key) {
-    self.queryString += utils.escapeName(self.currentTable, self.escapeCharacter) + '.' + utils.escapeName(key, self.escapeCharacter) + ', ';
+    self.queryString += utils.escapeName(key, self.escapeCharacter) + ', ';
   });
 
   // Remove trailing comma
