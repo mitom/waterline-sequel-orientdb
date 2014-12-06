@@ -3,7 +3,13 @@
   "description": "A helper library for generating OrientDB SQL queries from the Waterline Query Language.",
   "version": "0.0.19",
   "author": "Dário Marcelino <dario@appscot.com>",
-  "url": "http://github.com/balderdashy/waterline-sequel",
+  "url": "https://github.com/appscot/waterline-sequel-orientdb",
+  "contributors": [
+    {
+      "name": "Cody Stoltman",
+      "github": "https://github.com/particlebanana"
+    }
+  ],
   "keywords": [],
   "repository": {
     "type": "git",

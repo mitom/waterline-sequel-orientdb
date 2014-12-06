@@ -662,7 +662,8 @@ CriteriaProcessor.prototype.limit = function(options) {
   // Some MySQL hackery here.  For details, see:
   // http://stackoverflow.com/questions/255517/mysql-offset-infinite-rows
   if(options === null || options === undefined) {
-    this.queryString += ' LIMIT 2147483647 ';  // TODO: confirm this is the right approach for OrientDB
+    this.queryString += ' LIMIT 2147483646 ';  // -1 would be the more sensitive choice for OrientDB 
+                                               // but given https://github.com/orientechnologies/orientdb/issues/3141
   }
   else {
     this.queryString += ' LIMIT ' + options;
@@ -674,7 +675,7 @@ CriteriaProcessor.prototype.limit = function(options) {
  */
 
 CriteriaProcessor.prototype.skip = function(options) {
-  this.queryString += ' OFFSET ' + options;
+  this.queryString += ' SKIP ' + options;
 };
 
 /**
