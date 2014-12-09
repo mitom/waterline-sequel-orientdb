@@ -189,15 +189,15 @@ CriteriaProcessor.prototype.like = function like(val) {
   var self = this;
 
   var expandBlock = function(parent) {
-    var caseSensitive = true;
+    var caseSensitive = false;
 
     // Check if parent is a string, if so make sure it's case sensitive.
     if(self.currentSchema[parent] &&
-        (self.currentSchema[parent] === 'text' ||
-         self.currentSchema[parent] === 'string' ||
-         self.currentSchema[parent].type === 'string' ||
-         self.currentSchema[parent].type === 'text')) {
-      caseSensitive = false;
+        (self.currentSchema[parent] !== 'text' &&
+         self.currentSchema[parent] !== 'string' &&
+         self.currentSchema[parent].type !== 'string' &&
+         self.currentSchema[parent].type !== 'text')) {
+      caseSensitive = true;
     }
 
     var comparator = this.caseSensitive ? 'ILIKE' : 'LIKE';
@@ -219,11 +219,11 @@ CriteriaProcessor.prototype.like = function like(val) {
 
 CriteriaProcessor.prototype.and = function and(key, val) {
 
-  var caseSensitive = true;
+  var caseSensitive = false;
 
   // Check if key is a string
-  if(this.currentSchema[key] && this.currentSchema[key] === 'string') {
-    caseSensitive = false;
+  if(this.currentSchema[key] && this.currentSchema[key] !== 'string') {
+    caseSensitive = true;
   }
 
   this.process(key, val, '=', caseSensitive);
@@ -240,10 +240,10 @@ CriteriaProcessor.prototype._in = function _in(key, val) {
   var self = this;
 
   // Set case sensitive by default
-  var caseSensitivity = true;
+  var caseSensitivity = false;
 
-  // Set lower logic to false
-  var lower = false;
+  // Set lower logic to true
+  var lower = true;
 
   // Check if key is a string
   var schema = self.currentSchema && self.currentSchema[key];
@@ -251,9 +251,9 @@ CriteriaProcessor.prototype._in = function _in(key, val) {
     schema = { type: schema };
   }
 
-  if(schema && schema.type === 'text' || schema.type === 'string') {
-    caseSensitivity = false;
-    lower = true;
+  if(schema && schema.type !== 'text' && schema.type !== 'string') {
+    caseSensitivity = true;
+    lower = false;
   }
 
   // Override caseSensitivity for databases that don't support it
@@ -320,7 +320,7 @@ CriteriaProcessor.prototype.process = function process(parent, value, combinator
   // Expand criteria object
   function expandCriteria(obj) {
     var _param;
-    var lower = false;
+    var lower = true;
 
     _.keys(obj).forEach(function(key) {
 
@@ -329,13 +329,13 @@ CriteriaProcessor.prototype.process = function process(parent, value, combinator
         return expandCriteria(obj[key]);
       }
 
-      // Check if key is a string
+      // Check if key is not a string
       if (self.currentSchema[parent] && 
-           (self.currentSchema[parent].type === 'text' ||
-            self.currentSchema[parent].type === 'string' ||
-            self.currentSchema[parent] === 'string' ||
-            self.currentSchema[parent] === 'text')) {
-        lower = true;
+           (self.currentSchema[parent].type !== 'text' &&
+            self.currentSchema[parent].type !== 'string' &&
+            self.currentSchema[parent] !== 'string' &&
+            self.currentSchema[parent] !== 'text')) {
+        lower = false;
       }
 
       // Check if value is a string and if so add LOWER logic
@@ -366,15 +366,15 @@ CriteriaProcessor.prototype.process = function process(parent, value, combinator
   }
 
   // Set lower logic to true
-  var lower = false;
+  var lower = true;
 
   // Check if parent is a number or anything that can't be lowercased
   if(self.currentSchema[parent] && 
-      (self.currentSchema[parent] === 'text' ||
-       self.currentSchema[parent] === 'string' ||
-       self.currentSchema[parent].type === 'string' ||
-       self.currentSchema[parent].type === 'text')) {
-    lower = true;
+      (self.currentSchema[parent] !== 'text' &&
+       self.currentSchema[parent] !== 'string' &&
+       self.currentSchema[parent].type !== 'string' &&
+       self.currentSchema[parent].type !== 'text')) {
+    lower = false;
   }
 
   // Check if value is a string and if so add LOWER logic
