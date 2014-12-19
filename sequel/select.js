@@ -28,35 +28,11 @@ var SelectBuilder = module.exports = function(schema, currentTable, queryObject,
   }
 
   var queries = [];
-  if(queryObject.fetchPlan){
-    queries.push(this.buildFetchPlanSelect(queryObject));
-  } else {
-    queries.push(this.buildSimpleSelect(queryObject));
-  }
+  queries.push(this.buildSimpleSelect(queryObject));
 
   return {
     select: queries
   };
-};
-
-/**
- * Build a fetch plan Select statement.
- */
-
-SelectBuilder.prototype.buildFetchPlanSelect = function buildFetchPlanSelect(queryObject) {
-  var self = this;
-  
-  // Escape table name
-  var tableName = utils.escapeName(self.schema[self.currentTable].tableName, self.escapeCharacter);
-  delete queryObject.select;
-  
-  var query = 'SELECT ';
-  
-  query += "@this.toJSON('rid,fetchPlan:" + queryObject.fetchPlan + "')";
-  
-  query += ' FROM ' + tableName + ' ';
-  
-  return query;
 };
 
 /**
@@ -80,6 +56,9 @@ SelectBuilder.prototype.buildSimpleSelect = function buildSimpleSelect(queryObje
   var query = 'SELECT ';
 
   var attributes = queryObject.select || Object.keys(this.schema[this.currentTable].attributes);
+  if(queryObject.fetchPlan) {
+    attributes = _.union(attributes, queryObject.fetchPlan.select);
+  }
   delete queryObject.select;
   
   attributes.forEach(function(key) {
