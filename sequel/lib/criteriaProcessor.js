@@ -438,7 +438,7 @@ CriteriaProcessor.prototype.prepareCriterion = function prepareCriterion(key, va
   var escapedDate = false;
 
   // Check value for a date type
-  if(_.isDate(value)) {
+  if(_.isDate(value) && !self.parameterized) {
     value = value.getFullYear() + '-' +
       ('00' + (value.getMonth()+1)).slice(-2) + '-' +
       ('00' + value.getDate()).slice(-2) + ' ' +
