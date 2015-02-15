@@ -24,6 +24,7 @@ var CriteriaProcessor = module.exports = function CriteriaProcessor(currentTable
   this.currentSchema = schema[currentTable].attributes;
   this.queryString = '';
   this.values = [];
+  this.keys = [];
   this.paramCount = 0;
   this.parameterized = true;
   this.caseSensitive = true;
@@ -96,7 +97,8 @@ CriteriaProcessor.prototype.read = function read(options) {
 
   return {
     query: this.queryString,
-    values: this.values
+    values: this.values,
+    keys: this.keys
   };
 };
 
@@ -263,6 +265,7 @@ CriteriaProcessor.prototype._in = function _in(key, val) {
   }
 
   // Check case sensitivity to decide if LOWER logic is used
+  var originalKey = key;
   if(!caseSensitivity) {
     if(lower) {
       key = utils.escapeName(key, self.escapeCharacter)  + '.toLowerCase()';
@@ -286,6 +289,7 @@ CriteriaProcessor.prototype._in = function _in(key, val) {
     if(self.parameterized) {
       self.queryString += ':param' + self.paramCount + ',';
       self.paramCount++;
+      self.keys.push(originalKey);
     }
     else {
       if(_.isString(value) && !utils.matchRecordId(value)) {
@@ -352,6 +356,17 @@ CriteriaProcessor.prototype.process = function process(parent, value, combinator
       self.queryString += _param + ' ';
       self.prepareCriterion(key, obj[key]);
       self.queryString += ' AND ';
+      
+      if(self.parameterized) {
+        if(_.isArray(obj[key])){
+          var i;
+          for(i = 0; i < obj[key].length; i++){
+            self.keys.push(parent);
+          }
+        } else {
+          self.keys.push(parent);
+        }
+      }
     });
   }
 
@@ -382,6 +397,7 @@ CriteriaProcessor.prototype.process = function process(parent, value, combinator
 
   // Check if value is a string and if so add LOWER logic
   // to work with case in-sensitive queries
+  var originalKey = parent;
   if(!caseSensitive && lower && _.isString(value)) {
 
     // ADD LOWER to parent
@@ -399,6 +415,7 @@ CriteriaProcessor.prototype.process = function process(parent, value, combinator
     if(self.parameterized) {
       this.queryString += parent + ' ' + combinator + ' :param' + this.paramCount;
       this.values.push(value);
+      this.keys.push(originalKey);
       this.paramCount++;
     }
     else {
@@ -540,7 +557,7 @@ CriteriaProcessor.prototype.prepareCriterion = function prepareCriterion(key, va
             // Roll back one since we bump the count at the end
             this.paramCount--;
           }
-          else {
+          else {            
             str = 'NOT IN [';
             value.forEach(function(val) {
 

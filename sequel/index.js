@@ -49,6 +49,7 @@ var Sequel = module.exports = function(schema, options) {
   this.declareDeleteAlias = options && utils.object.hasOwnProperty(options, 'declareDeleteAlias') ? options.declareDeleteAlias : true;
 
   this.values = [];
+  this.keys = [];
 
   return this;
 };
@@ -77,6 +78,7 @@ Sequel.prototype.find = function find(currentTable, queryObject) {
 
   this.queries[0] += ' ' + whereObject.query;
   this.values[0] = whereObject.values;
+  this.keys[0] = whereObject.keys;
 
   /**
    * Step 3 - Build out the child query templates.
@@ -87,7 +89,8 @@ Sequel.prototype.find = function find(currentTable, queryObject) {
 
   return {
     query: this.queries,
-    values: this.values
+    values: this.values,
+    keys: this.keys
   };
 
 };

@@ -148,17 +148,20 @@ WhereBuilder.prototype.single = function single(queryObject, options) {
     queryString = queryString.slice(0, -4);
   }
 
-  var values;
+  var values, keys;
   if(parsedCriteria && _.isArray(parsedCriteria.values)) {
     values = parsedCriteria.values;
+    keys = parsedCriteria.keys;
   }
   else {
     values = [];
+    keys = [];
   }
 
   return {
     query: queryString,
-    values: values
+    values: values,
+    keys: keys
   };
 };
 
