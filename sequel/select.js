@@ -72,6 +72,11 @@ SelectBuilder.prototype.buildSimpleSelect = function buildSimpleSelect(queryObje
     
     selectKeys.push({ table: self.currentTable, key: schema.columnName || selectKey });
   });
+  
+  // Make sure schemaless properties are retrieved
+  if(queryObject.schemaless) {
+    selectKeys.push({ table: self.currentTable, key: '*' });
+  }
 
   // Add any hasFK strategy joins to the main query
   _.keys(queryObject.instructions).forEach(function(attr) {
