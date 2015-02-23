@@ -59,6 +59,7 @@ SelectBuilder.prototype.buildSimpleSelect = function buildSimpleSelect(queryObje
   if(queryObject.fetchPlan) {
     attributes = _.union(attributes, queryObject.fetchPlan.select);
   }
+  var addWildcard = queryObject.schemaless && !queryObject.select;
   delete queryObject.select;
   
   attributes.forEach(function(key) {
@@ -74,7 +75,7 @@ SelectBuilder.prototype.buildSimpleSelect = function buildSimpleSelect(queryObje
   });
   
   // Make sure schemaless properties are retrieved
-  if(queryObject.schemaless) {
+  if(addWildcard) {
     selectKeys.push({ table: self.currentTable, key: '*' });
   }
 
