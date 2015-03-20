@@ -615,11 +615,11 @@ CriteriaProcessor.prototype.prepareCriterion = function prepareCriterion(key, va
         comparator = 'ILIKE';
       }
       else {
-        comparator = 'LIKE';
+        comparator = 'CONTAINSTEXT';
       }
 
       if(this.parameterized) {
-        this.values.push('%' + value + '%');
+        this.values.push('' + value);
         str = comparator + ' ' + ':param' + this.paramCount;
       }
       else {
