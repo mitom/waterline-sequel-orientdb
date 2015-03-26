@@ -69,7 +69,7 @@ SelectBuilder.prototype.buildSimpleSelect = function buildSimpleSelect(queryObje
     var schema = self.schema[self.currentTable].attributes[key] || {};
     if(hop(schema, 'collection')) return;
     
-    var selectKey = key === 'id' ? '@rid' : key;  // Philosophically unsure if this belongs to waterline-sequel-orientb or waterline-orientdb
+    var selectKey = key === 'id' ? '@rid' : key;  // Philosophically unsure if this belongs to waterline-sequel-orientb or sails-orientdb
     
     selectKeys.push({ table: self.currentTable, key: schema.columnName || selectKey });
   });
