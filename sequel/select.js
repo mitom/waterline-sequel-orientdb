@@ -62,6 +62,7 @@ SelectBuilder.prototype.buildSimpleSelect = function buildSimpleSelect(queryObje
   var addWildcard = queryObject.schemaless && !queryObject.select;
   delete queryObject.select;
   
+  var ridPresent = false;
   attributes.forEach(function(key) {
     // Default schema to {} in case a raw DB column name is sent.  This shouldn't happen
     // after https://github.com/balderdashy/waterline/commit/687c869ad54f499018ab0b038d3de4435c96d1dd
@@ -69,10 +70,19 @@ SelectBuilder.prototype.buildSimpleSelect = function buildSimpleSelect(queryObje
     var schema = self.schema[self.currentTable].attributes[key] || {};
     if(hop(schema, 'collection')) return;
     
-    var selectKey = key === 'id' ? '@rid' : key;  // Philosophically unsure if this belongs to waterline-sequel-orientb or sails-orientdb
+    var selectKey = key;
+    if(key === 'id' || key === '@rid'){
+      selectKey = '@rid';  // Philosophically unsure if this belongs to waterline-sequel-orientb or sails-orientdb
+      ridPresent = true;
+    }
     
     selectKeys.push({ table: self.currentTable, key: schema.columnName || selectKey });
   });
+  
+  // We need the @rid for delete vertex/edge to work properly
+  if(!ridPresent && !addWildcard){
+    selectKeys.push({ table: self.currentTable, key: '@rid' });
+  }
   
   // Make sure schemaless properties are retrieved
   if(addWildcard) {
