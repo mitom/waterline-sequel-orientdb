@@ -608,7 +608,20 @@ CriteriaProcessor.prototype.prepareCriterion = function prepareCriterion(key, va
       }
 
       break;
-
+      
+    case 'lucene':
+      
+      comparator = 'LUCENE';
+      if(this.parameterized) {
+        this.values.push('' + value);
+        str = comparator + ' ' + ':param' + this.paramCount;
+      }
+      else {
+        str = comparator + ' ' + utils.escapeName(value, '"');
+      }
+      
+      break;
+      
     case 'contains':
 
       if(this.caseSensitive) {
